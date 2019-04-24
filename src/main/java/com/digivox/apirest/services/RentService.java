@@ -1,5 +1,7 @@
 package com.digivox.apirest.services;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.joda.time.DateTimeConstants;
@@ -8,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.digivox.apirest.dto.RentDTO;
+import com.digivox.apirest.models.Book;
+import com.digivox.apirest.models.Client;
 import com.digivox.apirest.models.Rent;
 import com.digivox.apirest.repository.BookRepository;
 import com.digivox.apirest.repository.BookingRepsitory;
@@ -53,28 +57,49 @@ public class RentService {
 	}
 	
 	public String save(RentDTO rentDTO) {
-//		LocalDate startDate = new LocalDate();
-//		LocalDate devolutionDate = startDate.plusDays(7);
-//		Client client = clientRepository.findById(rentDTO.getClient());
-//		Book book = bookRepository.findById(rentDTO.getBook());
-//		BigDecimal price = new BigDecimal("10.99");
-//		
-//
-//		Rent rent = new Rent(rentDTO.getId(), client, book, startDate, devolutionDate, price);
-//		Verifica se o livro já está reservado pela pessoa que está alugando ou por outro cliente		
-//		if (bookingRepository.existsByDateAndBookAndClientAndIsCancelled(startDate, book, client, false) || 
-//				!bookingRepository.existsByDateAndBookAndIsCancelled(startDate, book, false)) {
-//			if (rentDTO.getId() > 0) {				
-//			}else {
-//				rent = new Rent(client, book, startDate, devolutionDate, price);
-//			}
-//			rentRepository.save(rent);
-//			return "Success";
-//		} else {
-//			return "Fail, Livro ja foi reservado nesta data por outra pessoa";
-//		}
-		return null;
+		LocalDate startDate = new LocalDate();
+		LocalDate devolutionDate = startDate.plusDays(7);
 		
+		Client client = clientRepository.findById(rentDTO.getClient());
+		
+		BigDecimal price = new BigDecimal("10.99");
+				
+		if (rentDTO.getId() == 0) {
+			Rent rent = new Rent(rentDTO.getId(), client, startDate, devolutionDate, price);
+			
+			for (long l : rentDTO.getBooks()) {
+				Book book = bookRepository.findById(l);
+				if (!bookingRepository.existsByDateAndBooksAndCancelled(startDate, book, false)) {			
+					rent.getBooks().add(book);
+				}	
+			}
+			if (rent.getBooks().size() > 0) {
+				rentRepository.save(rent);				
+			} 
+
+		}else {
+			Rent rent = rentRepository.findById(rentDTO.getId());
+			List<Book> b = new ArrayList<>();
+			
+			rent.setBooks(b);
+			
+			for (long l : rentDTO.getBooks()) {
+				Book book = bookRepository.findById(l);
+				if (!bookingRepository.existsByDateAndBooksAndCancelled(startDate, book, false) || 
+						bookingRepository.existsByDateAndBooksAndClientAndCancelled(startDate, book, client, false)) {
+					rent.getBooks().add(book);
+				}
+			}
+			
+			rent.setClient(clientRepository.findById(rentDTO.getClient()));
+			
+			if (rent.getBooks().size() > 0) {
+				rentRepository.save(rent);				
+			}
+						
+		}
+		
+		return "Success";
 	}
 	
 	public void delete(long id) {

@@ -7,8 +7,7 @@ public class RentDTO {
 	private long id;
 	
 	@NotNull
-	private long book;
-	
+	private long [] books;
 
 	@NotNull
 	private long client;
@@ -21,20 +20,20 @@ public class RentDTO {
 		this.id = id;
 	}
 
-	public long getBook() {
-		return book;
-	}
-
-	public void setBook(long book) {
-		this.book = book;
-	}
-
 	public long getClient() {
 		return client;
 	}
 
 	public void setClient(long client) {
 		this.client = client;
+	}
+
+	public long[] getBooks() {
+		return books;
+	}
+	
+	public void setBooks(long[] books) {
+		this.books = books;
 	}
 	
 }

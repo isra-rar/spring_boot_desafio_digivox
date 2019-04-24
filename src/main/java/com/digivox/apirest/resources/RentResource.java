@@ -40,7 +40,6 @@ public class RentResource {
 		return rentService.findAllThisWeekDevolution();
 	}
 	
-	
 	@GetMapping("/rent/{id}")
 	public Rent get(@PathVariable(value="id") long id) {
 		return rentService.findById(id);

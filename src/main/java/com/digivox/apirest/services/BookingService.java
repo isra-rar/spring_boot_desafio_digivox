@@ -17,11 +17,15 @@ import com.digivox.apirest.models.Client;
 import com.digivox.apirest.repository.BookRepository;
 import com.digivox.apirest.repository.BookingRepsitory;
 import com.digivox.apirest.repository.ClientRepository;
+import com.digivox.apirest.repository.RentRepository;
 import com.digivox.apirest.services.exceptions.ObjectNotFoundException;
 
 @Service
 public class BookingService {
 
+	@Autowired
+	RentRepository rentRepository;
+	
 	@Autowired
 	BookingRepsitory bookingRepository;
 
@@ -70,8 +74,15 @@ public class BookingService {
 
 			for (long l : bookingDTO.getBooks()) {
 				Book book = bookRepository.findById(l);
-				if (!bookingRepository.existsByDateAndBooksAndCancelled(date, book, false) || 
-						bookingRepository.existsByDateAndBooksAndClientAndCancelled(date, book, client, false)) {					
+				if (
+					
+					!bookingRepository.existsByDateAndBooksAndCancelled(date, book, false) || 
+					bookingRepository.existsByDateAndBooksAndClientAndCancelled(date, book, client, false) ||
+					!rentRepository.existsByBooksAndReturned(book, false) || 
+					rentRepository.existsByBooksAndClientAndReturned(book, client, false)
+
+					
+					) {					
 					booking.getBooks().add(book);
 				}
 			}

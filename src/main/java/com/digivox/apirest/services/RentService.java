@@ -62,7 +62,9 @@ public class RentService {
 
 		Client client = clientRepository.findById(rentDTO.getClient());
 
-		BigDecimal price = new BigDecimal("10.99");
+		BigDecimal price = new BigDecimal("0");
+		
+		double priceBook = 5.99;
 
 		if (rentDTO.getId() == 0) {
 			Rent rent = new Rent(rentDTO.getId(), client, startDate, devolutionDate, price);
@@ -74,6 +76,7 @@ public class RentService {
 						!rentRepository.existsByBooksAndReturned(book, false)
 					) {			
 					rent.getBooks().add(book);
+					rent.setPrice(BigDecimal.valueOf(rent.getPrice().doubleValue() + priceBook));
 				}	
 			}
 			if (rent.getBooks().size() > 0) {
@@ -85,6 +88,7 @@ public class RentService {
 			List<Book> b = new ArrayList<>();
 
 			rent.setBooks(b);
+			rent.setPrice(BigDecimal.valueOf(0));
 
 			for (long l : rentDTO.getBooks()) {
 				Book book = bookRepository.findById(l);
@@ -96,6 +100,7 @@ public class RentService {
 
 						) {
 					rent.getBooks().add(book);
+					rent.setPrice(BigDecimal.valueOf(rent.getPrice().doubleValue() + priceBook));
 				}
 			}
 

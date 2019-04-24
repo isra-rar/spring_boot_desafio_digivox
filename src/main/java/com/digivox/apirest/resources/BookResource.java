@@ -28,7 +28,7 @@ public class BookResource {
 	public List<Book> books(){
 		return bookRepository.findAll();
 	}
-	
+
 	@GetMapping("/book/{id}")
 	public Book book(@PathVariable(value="id") long id){
 		return bookRepository.findById(id);

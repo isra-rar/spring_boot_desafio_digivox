@@ -2,15 +2,21 @@ package com.digivox.apirest.models;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
 import org.joda.time.LocalDate;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 public class Rent implements Serializable {
@@ -25,9 +31,12 @@ public class Rent implements Serializable {
 	@NotNull
 	private Client client;
 
-	@OneToOne
-	@NotNull
-	private Book book;
+    @OneToMany(
+		fetch = FetchType.EAGER
+    )
+    @JsonIgnoreProperties("booking")
+	private List<Book> books = new ArrayList<>();
+
 
 	private LocalDate startDate;
 
@@ -37,31 +46,50 @@ public class Rent implements Serializable {
 	private BigDecimal price;
 	
 	@NotNull
-	private boolean isReturned;
+	private boolean isReturned = false;
 
 	public Rent () {
 
 	}
 
-	public Rent(@NotNull Client client, @NotNull Book book, LocalDate startDate, LocalDate devolutionDate,
+	public Rent(@NotNull Client client, LocalDate startDate, LocalDate devolutionDate,
 			@NotNull BigDecimal price) {
 		super();
 		this.client = client;
-		this.book = book;
 		this.startDate = startDate;
 		this.devolutionDate = devolutionDate;
 		this.price = price;
 	}
 
-	public Rent(long id, @NotNull Client client, @NotNull Book book, LocalDate startDate, LocalDate devolutionDate,
+	public Rent(long id, @NotNull Client client, LocalDate startDate, LocalDate devolutionDate,
 			@NotNull BigDecimal price) {
 		super();
 		this.id = id;
 		this.client = client;
-		this.book = book;
 		this.startDate = startDate;
 		this.devolutionDate = devolutionDate;
 		this.price = price;
+	}
+
+	
+	public boolean isReturned() {
+		return isReturned;
+	}
+
+	public void setReturned(boolean isReturned) {
+		this.isReturned = isReturned;
+	}
+
+	public void setId(long id) {
+		this.id = id;
+	}
+
+	public List<Book> getBooks() {
+		return books;
+	}
+	
+	public void setBooks(List<Book> books) {
+		this.books = books;
 	}
 
 	public BigDecimal getPrice() {
@@ -86,14 +114,6 @@ public class Rent implements Serializable {
 
 	public void setClient(Client client) {
 		this.client = client;
-	}
-
-	public Book getBook() {
-		return book;
-	}
-
-	public void setBook(Book book) {
-		this.book = book;
 	}
 
 	public LocalDate getStartDate() {

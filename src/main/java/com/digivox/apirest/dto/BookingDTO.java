@@ -9,12 +9,12 @@ public class BookingDTO {
 	private long id;
 	
 	@NotNull
-	private long book;
+	private long [] books;
 	
 	@NotNull
 	private long client;
 	
-	@JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-M-dd")
+	@JsonFormat(shape=JsonFormat.Shape.STRING, pattern="yyyy-mm-dd")
 	@NotNull
 	private String date;
 	
@@ -38,12 +38,12 @@ public class BookingDTO {
 		return date;
 	}
 
-	public long getBook() {
-		return book;
+	public long[] getBooks() {
+		return books;
 	}
 
-	public void setBook(long book) {
-		this.book = book;
+	public void setBooks(long[] books) {
+		this.books = books;
 	}
 
 	public void setDate(String date) {

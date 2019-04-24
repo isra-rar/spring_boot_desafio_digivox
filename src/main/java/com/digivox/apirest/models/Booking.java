@@ -1,11 +1,15 @@
 package com.digivox.apirest.models;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
@@ -20,52 +24,49 @@ public class Booking implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
 
-	@OneToOne
 	@NotNull
+	@OneToOne
 	private Client client;
 
-    @OneToOne
-	private Book book;
+    @ManyToMany(fetch = FetchType.EAGER)
+	private List<Book> books = new ArrayList<>();
 
 	@NotNull
     private LocalDate date;
     
     @NotNull
-    private boolean isCancelled;
+    private boolean cancelled;
 
 	public Booking() {
 		
 	}
-	
-	public Booking(Client client, Book book, LocalDate date, boolean isCanceled) {
+
+	public Booking(Client client, LocalDate date, boolean isCanceled) {
 		this.client = client;
-		this.book = book;
 		this.date = date;
-		this.isCancelled = isCanceled;
+		this.cancelled = isCanceled;
 	}
 	
-	public Booking(long id, Client client, Book book, LocalDate date) {
+	public Booking(long id, Client client, LocalDate date) {
 		this.id = id;
 		this.client = client;
-		this.book = book;
 		this.date = date;
 	}
-	
-	
-	public Book getBook() {
-		return book;
-	}
 
-	public void setBook(Book book) {
-		this.book = book;
+	public List<Book> getBooks() {
+		return books;
 	}
-
-	public boolean getisCancelled() {
-		return isCancelled;
+	
+	public void setBooks(List<Book> books) {
+		this.books = books;
+	}
+	
+	public boolean isCancelled() {
+		return cancelled;
 	}
 
 	public void setCancelled(boolean isCancelled) {
-		this.isCancelled = isCancelled;
+		this.cancelled = isCancelled;
 	}
 
 	public long getId() {

@@ -24,12 +24,24 @@ public class Book implements Serializable {
 	private String author;
 	
 	@NotNull
-	private Integer numberOfPages;
+	private Integer numberOfPages;	
+
+	@NotNull
+	private boolean rented = false;	
 	
+
 	public Book() {
 		
 	}
+
+	public boolean isRented() {
+		return rented;
+	}
 	
+	public void setRented(boolean rented) {
+		this.rented = rented;
+	}
+
 	public String getAuthor() {
 		return author;
 	}

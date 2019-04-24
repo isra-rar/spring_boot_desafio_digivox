@@ -13,9 +13,9 @@ public interface BookingRepsitory extends JpaRepository<Booking, Long> {
 
 	Booking findById(long id);
 
-	boolean existsByDateAndBookAndIsCancelled(LocalDate date, Book book, boolean isCancelled);
+	boolean existsByDateAndBooksAndCancelled(LocalDate date, Book books, boolean cancelled);
 
-	boolean existsByDateAndBookAndClientAndIsCancelled(LocalDate date, Book book, Client client, boolean isCancelled);
+	boolean existsByDateAndBooksAndClientAndCancelled(LocalDate date, Book books, Client client, boolean cancelled);
 	
 	List<Booking> findAllByDateBetween(LocalDate dateAfter, LocalDate dateBefore);
 }	

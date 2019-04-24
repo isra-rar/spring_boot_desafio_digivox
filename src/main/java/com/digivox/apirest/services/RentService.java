@@ -1,6 +1,5 @@
 package com.digivox.apirest.services;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import org.joda.time.DateTimeConstants;
@@ -9,8 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.digivox.apirest.dto.RentDTO;
-import com.digivox.apirest.models.Book;
-import com.digivox.apirest.models.Client;
 import com.digivox.apirest.models.Rent;
 import com.digivox.apirest.repository.BookRepository;
 import com.digivox.apirest.repository.BookingRepsitory;
@@ -56,26 +53,27 @@ public class RentService {
 	}
 	
 	public String save(RentDTO rentDTO) {
-		LocalDate startDate = new LocalDate();
-		LocalDate devolutionDate = startDate.plusDays(7);
-		Client client = clientRepository.findById(rentDTO.getClient());
-		Book book = bookRepository.findById(rentDTO.getBook());
-		BigDecimal price = new BigDecimal("10.99");
-		
+//		LocalDate startDate = new LocalDate();
+//		LocalDate devolutionDate = startDate.plusDays(7);
+//		Client client = clientRepository.findById(rentDTO.getClient());
+//		Book book = bookRepository.findById(rentDTO.getBook());
+//		BigDecimal price = new BigDecimal("10.99");
+//		
+//
+//		Rent rent = new Rent(rentDTO.getId(), client, book, startDate, devolutionDate, price);
 //		Verifica se o livro já está reservado pela pessoa que está alugando ou por outro cliente		
-		if (bookingRepository.existsByDateAndBookAndClientAndIsCancelled(startDate, book, client, false) || 
-				!bookingRepository.existsByDateAndBookAndIsCancelled(startDate, book, false)) {
-			Rent rent = null;
-			if (rentDTO.getId() > 0) {				
-				rent = new Rent(rentDTO.getId(), client, book, startDate, devolutionDate, price);
-			}else {
-				rent = new Rent(client, book, startDate, devolutionDate, price);
-			}
-			rentRepository.save(rent);
-			return "Success";
-		} else {
-			return "Fail, Livro ja foi reservado nesta data por outra pessoa";
-		}
+//		if (bookingRepository.existsByDateAndBookAndClientAndIsCancelled(startDate, book, client, false) || 
+//				!bookingRepository.existsByDateAndBookAndIsCancelled(startDate, book, false)) {
+//			if (rentDTO.getId() > 0) {				
+//			}else {
+//				rent = new Rent(client, book, startDate, devolutionDate, price);
+//			}
+//			rentRepository.save(rent);
+//			return "Success";
+//		} else {
+//			return "Fail, Livro ja foi reservado nesta data por outra pessoa";
+//		}
+		return null;
 		
 	}
 	

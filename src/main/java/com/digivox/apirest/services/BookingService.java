@@ -1,5 +1,6 @@
 package com.digivox.apirest.services;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.joda.time.DateTimeConstants;
@@ -37,7 +38,7 @@ public class BookingService {
 	public List<Booking> findAllThisWeek(){
 		LocalDate now = new LocalDate();
 		return bookingRepository.findAllByDateBetween(now.withDayOfWeek(DateTimeConstants.MONDAY),
-				now.withDayOfWeek(DateTimeConstants.FRIDAY));
+				now.withDayOfWeek(DateTimeConstants.SATURDAY));
 	}
 
 	public Booking findById(long id) {
@@ -45,28 +46,49 @@ public class BookingService {
 	}
 
 	public String save(BookingDTO bookingDTO) {
-		DateTimeFormatter FORMATTER = DateTimeFormat.forPattern("yyyy-M-dd");
-		Client client = clientRepository.findById(bookingDTO.getClient());
+		DateTimeFormatter FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd");
 		LocalDate date = FORMATTER.parseLocalDate(bookingDTO.getDate());
-		Book book = bookRepository.getOne(bookingDTO.getBook());
-		if (!bookingRepository.existsByDateAndBookAndIsCancelled(date, book, false)) {			
-			Booking booking = null;
-			if (bookingDTO.getId() > 0) {				
-				booking = new Booking(bookingDTO.getId(), client, book, date);	
-			} else {				
-				booking = new Booking(client, book, date, false);	
-			}
-			bookingRepository.save(booking);
-			return "Success";
-		}else {
-			return "Fail, livro ja foi reservado nesta data";
-		}
+		Client client = clientRepository.findById(bookingDTO.getClient());
 		
+		if (bookingDTO.getId() == 0) {
+			Booking booking = new Booking(client, date, false);
+			
+			for (long l : bookingDTO.getBooks()) {
+				Book book = bookRepository.findById(l);
+				if (!bookingRepository.existsByDateAndBooksAndCancelled(date, book, false)) {					
+					booking.getBooks().add(book);
+				}
+			}
+			
+			if (booking.getBooks().size() > 0) {				
+				bookingRepository.save(booking);
+			}
+		} else {
+			Booking booking = bookingRepository.findById(bookingDTO.getId());
+			List<Book> b = new ArrayList<>();
+			booking.setBooks(b);
+			
+			for (long l : bookingDTO.getBooks()) {
+				Book book = bookRepository.findById(l);
+				if (!bookingRepository.existsByDateAndBooksAndCancelled(date, book, false) || 
+						bookingRepository.existsByDateAndBooksAndClientAndCancelled(date, book, client, false)) {					
+					booking.getBooks().add(book);
+				}
+			}
+			
+			booking.setClient(clientRepository.findById(bookingDTO.getClient()));
+			booking.setDate(date);
+			if (booking.getBooks().size() > 0) {				
+				bookingRepository.save(booking);
+			}
+		}
+
+		return "Success";
 	}
 
 	public void changeStatusBooking(long id) {
 		Booking booking = bookingRepository.findById(id);
-		booking.setCancelled(!booking.getisCancelled());
+		booking.setCancelled(!booking.isCancelled());
 		bookingRepository.save(booking);
 	}
 
@@ -74,7 +96,7 @@ public class BookingService {
 		try {
 			Booking booking = bookingRepository.findById(id);
 			bookingRepository.delete(booking);				
-		} catch (Exception e) {
+		} catch (ObjectNotFoundException e) {
 			throw new ObjectNotFoundException("ObjectNotFound!");
 		}
 	}

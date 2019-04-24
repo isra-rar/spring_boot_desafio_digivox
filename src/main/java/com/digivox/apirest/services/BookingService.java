@@ -49,17 +49,17 @@ public class BookingService {
 		DateTimeFormatter FORMATTER = DateTimeFormat.forPattern("yyyy-MM-dd");
 		LocalDate date = FORMATTER.parseLocalDate(bookingDTO.getDate());
 		Client client = clientRepository.findById(bookingDTO.getClient());
-		
+
 		if (bookingDTO.getId() == 0) {
 			Booking booking = new Booking(client, date, false);
-			
+
 			for (long l : bookingDTO.getBooks()) {
 				Book book = bookRepository.findById(l);
 				if (!bookingRepository.existsByDateAndBooksAndCancelled(date, book, false)) {					
 					booking.getBooks().add(book);
 				}
 			}
-			
+
 			if (booking.getBooks().size() > 0) {				
 				bookingRepository.save(booking);
 			}
@@ -67,7 +67,7 @@ public class BookingService {
 			Booking booking = bookingRepository.findById(bookingDTO.getId());
 			List<Book> b = new ArrayList<>();
 			booking.setBooks(b);
-			
+
 			for (long l : bookingDTO.getBooks()) {
 				Book book = bookRepository.findById(l);
 				if (!bookingRepository.existsByDateAndBooksAndCancelled(date, book, false) || 
@@ -75,7 +75,7 @@ public class BookingService {
 					booking.getBooks().add(book);
 				}
 			}
-			
+
 			booking.setClient(clientRepository.findById(bookingDTO.getClient()));
 			booking.setDate(date);
 			if (booking.getBooks().size() > 0) {				
@@ -88,7 +88,7 @@ public class BookingService {
 
 	public void changeStatusBooking(long id) {
 		Booking booking = bookingRepository.findById(id);
-		booking.setCancelled(!booking.isCancelled());
+		booking.setCancelled(true);
 		bookingRepository.save(booking);
 	}
 

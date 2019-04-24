@@ -10,13 +10,11 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
+import javax.persistence.ManyToMany;
 import javax.persistence.OneToOne;
 import javax.validation.constraints.NotNull;
 
 import org.joda.time.LocalDate;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 public class Rent implements Serializable {
@@ -31,12 +29,8 @@ public class Rent implements Serializable {
 	@NotNull
 	private Client client;
 
-    @OneToMany(
-		fetch = FetchType.EAGER
-    )
-    @JsonIgnoreProperties("booking")
+    @ManyToMany(fetch = FetchType.EAGER)
 	private List<Book> books = new ArrayList<>();
-
 
 	private LocalDate startDate;
 
@@ -46,7 +40,7 @@ public class Rent implements Serializable {
 	private BigDecimal price;
 	
 	@NotNull
-	private boolean isReturned = false;
+	private boolean returned = false;
 
 	public Rent () {
 
@@ -73,11 +67,11 @@ public class Rent implements Serializable {
 
 	
 	public boolean isReturned() {
-		return isReturned;
+		return returned;
 	}
 
 	public void setReturned(boolean isReturned) {
-		this.isReturned = isReturned;
+		this.returned = isReturned;
 	}
 
 	public void setId(long id) {

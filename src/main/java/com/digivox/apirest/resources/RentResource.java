@@ -59,4 +59,10 @@ public class RentResource {
 	public String update(@RequestBody RentDTO rentDTO) {
 		return rentService.save(rentDTO);
 	}
+	
+	@PutMapping("/rent/status/{id}")
+	public void changeStatusBooking(@PathVariable(value="id") long id) {
+		rentService.changeStatusRent(id);
+	}
+	
 }

@@ -27,13 +27,13 @@ public class RentService {
 
 	@Autowired
 	BookingRepsitory bookingRepository;
-	
+
 	@Autowired
 	ClientRepository clientRepository;
-	
+
 	@Autowired
 	BookRepository bookRepository;
-	
+
 	public List<Rent> findAll(){
 		return rentRepository.findAll();
 	}
@@ -51,25 +51,28 @@ public class RentService {
 				now.withDayOfWeek(DateTimeConstants.MONDAY),
 				now.withDayOfWeek(DateTimeConstants.SUNDAY));
 	}
-	
+
 	public Rent findById(long id) {
 		return rentRepository.findById(id);
 	}
-	
+
 	public String save(RentDTO rentDTO) {
 		LocalDate startDate = new LocalDate();
 		LocalDate devolutionDate = startDate.plusDays(7);
-		
+
 		Client client = clientRepository.findById(rentDTO.getClient());
-		
+
 		BigDecimal price = new BigDecimal("10.99");
-				
+
 		if (rentDTO.getId() == 0) {
 			Rent rent = new Rent(rentDTO.getId(), client, startDate, devolutionDate, price);
-			
+
 			for (long l : rentDTO.getBooks()) {
 				Book book = bookRepository.findById(l);
-				if (!bookingRepository.existsByDateAndBooksAndCancelled(startDate, book, false)) {			
+				if (
+						!bookingRepository.existsByDateAndBooksAndCancelled(startDate, book, false) &&
+						!rentRepository.existsByBooksAndReturned(book, false)
+					) {			
 					rent.getBooks().add(book);
 				}	
 			}
@@ -80,28 +83,39 @@ public class RentService {
 		}else {
 			Rent rent = rentRepository.findById(rentDTO.getId());
 			List<Book> b = new ArrayList<>();
-			
+
 			rent.setBooks(b);
-			
+
 			for (long l : rentDTO.getBooks()) {
 				Book book = bookRepository.findById(l);
-				if (!bookingRepository.existsByDateAndBooksAndCancelled(startDate, book, false) || 
-						bookingRepository.existsByDateAndBooksAndClientAndCancelled(startDate, book, client, false)) {
+				if (
+						!bookingRepository.existsByDateAndBooksAndCancelled(startDate, book, false) || 
+						bookingRepository.existsByDateAndBooksAndClientAndCancelled(startDate, book, client, false) ||
+						!rentRepository.existsByBooksAndReturned(book, false) || 
+						rentRepository.existsByBooksAndClientAndReturned(book, client, false)
+
+						) {
 					rent.getBooks().add(book);
 				}
 			}
-			
+
 			rent.setClient(clientRepository.findById(rentDTO.getClient()));
-			
+
 			if (rent.getBooks().size() > 0) {
 				rentRepository.save(rent);				
 			}
-						
+
 		}
-		
+
 		return "Success";
 	}
-	
+
+	public void changeStatusRent(long id) {
+		Rent rent = rentRepository.findById(id);
+		rent.setReturned(true);
+		rentRepository.save(rent);
+	}
+
 	public void delete(long id) {
 		try {
 			Rent rent = rentRepository.findById(id);
